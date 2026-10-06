@@ -55,6 +55,8 @@ const clear = node => { while (node && node.firstChild) node.removeChild(node.fi
 
 const ICONS = {
   chevron:   '<path d="M9 6l6 6-6 6"/>',
+  chevronsLeft:  '<path d="M11 7l-5 5 5 5"/><path d="M18 7l-5 5 5 5"/>',
+  chevronsRight: '<path d="M13 7l5 5-5 5"/><path d="M6 7l5 5-5 5"/>',
   down:      '<path d="M6 9l6 6 6-6"/>',
   up:        '<path d="M18 15l-6-6-6 6"/>',
   close:     '<path d="M18 6L6 18M6 6l12 12"/>',
@@ -726,6 +728,7 @@ const prototypeState = {
 
 const productState = {
   view: 'quick-actions',              /* quick-actions | insights | records | project */
+  sidebarCollapsed: false,            /* product sidebar folded to an icon rail */
   qa: { expanded: null, scrollX: 0 }, /* board context preserved across overlays */
   records: { tab: 'ongoing', query: '', filters: { pm: 'all', status: 'all', delay: 'all' }, sort: { key: 'name', dir: 'asc' } },
   project: { id: null, section: 'details', focusId: null, returnTo: null },
@@ -1332,15 +1335,22 @@ function applyRailState() {
 
   const btn = $('#railToggle');
   if (btn) {
+    clear(btn);
+    btn.appendChild(icon(collapsed ? 'chevronsRight' : 'chevronsLeft', 13));
+    btn.appendChild(h('span', { class: 'rail-toggle__label', text: collapsed ? 'Expand' : 'Collapse' }));
     btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
     btn.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
     btn.title = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
-    if (!btn.firstChild) btn.appendChild(icon('chevron', 12));
   }
 }
 function toggleRail() {
   prototypeState.railCollapsed = !prototypeState.railCollapsed;
   applyRailState();
+}
+
+function toggleProductSidebar() {
+  productState.sidebarCollapsed = !productState.sidebarCollapsed;
+  renderAll();
 }
 
 function setRole(roleId) {
@@ -1379,7 +1389,11 @@ function buildProductSidebar() {
   const navItem = (opts) => {
     const active = opts.active;
     return h('button', {
-      type: 'button', class: 'nav-item', attrs: { 'aria-current': active ? 'page' : null, 'data-nav': opts.id },
+      type: 'button', class: 'nav-item',
+      attrs: {
+        'aria-current': active ? 'page' : null, 'data-nav': opts.id,
+        title: opts.count != null ? opts.label + ' · ' + opts.count : opts.label
+      },
       on: { click: opts.onClick }
     }, icon(opts.icon, 13), h('span', { class: 'nav-item__label', text: opts.label }),
       opts.count != null ? h('span', { class: 'nav-count', text: String(opts.count) }) : null);
@@ -1422,12 +1436,22 @@ function buildProductSidebar() {
       }))));
 
   const u = currentUser();
+  const sCollapsed = !!productState.sidebarCollapsed;
   return h('aside', { class: 'pside' },
     h('div', { class: 'pside__brand' },
       h('div', { class: 'pside__glyph' }, icon('building', 14)),
-      h('div', {},
+      h('div', { class: 'pside__brand-text' },
         h('div', { class: 'pside__name', text: 'PM Dashboard' }),
-        h('div', { class: 'pside__env', text: 'Construction operations' }))),
+        h('div', { class: 'pside__env', text: 'Construction operations' })),
+      h('button', {
+        type: 'button', class: 'pside__toggle',
+        attrs: {
+          id: 'psideToggle',
+          'aria-expanded': sCollapsed ? 'false' : 'true',
+          'aria-label': sCollapsed ? 'Expand navigation' : 'Collapse navigation',
+          title: sCollapsed ? 'Expand navigation' : 'Collapse navigation'
+        }
+      }, icon(sCollapsed ? 'chevronsRight' : 'chevronsLeft', 13))),
     nav,
     h('div', { class: 'pside__user' },
       h('div', { class: 'avatar', text: u.initials }),
@@ -1471,6 +1495,7 @@ function buildProductHeader() {
 function renderProduct() {
   const root = $('#product');
   clear(root);
+  root.classList.toggle('is-sidebar-collapsed', !!productState.sidebarCollapsed);
   root.appendChild(buildProductSidebar());
 
   const content = h('div', { class: 'pcontent' + (productState.view === 'quick-actions' ? ' pcontent--flush' : '') });
@@ -3073,7 +3098,14 @@ const openMoneyRecord = (pid, id, kind) => (kind === 'client' ? clientMoneyModal
 function init() {
   initDB();
   renderAll();
-  $('#railToggle').addEventListener('click', toggleRail);
+  /* Delegated so the controls keep working across re-renders, and so a
+     half-cached page can never end up with an inert button. */
+  document.addEventListener('click', e => {
+    const t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('#railToggle')) { e.preventDefault(); toggleRail(); return; }
+    if (t.closest('#psideToggle')) { e.preventDefault(); toggleProductSidebar(); return; }
+  });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && activeOverlay) { e.preventDefault(); closeOverlay(); }
   });
@@ -3085,5 +3117,5 @@ else init();
 window.PM = {
   prototypeState, productState, DB, ROLES, CATEGORIES,
   buildActions, visibleActions, actionsByCategory, buildInsights,
-  selectFlow, setRole, toggleRail, openAction, openProject, closeProject, gotoSection, expandColumn
+  selectFlow, setRole, toggleRail, toggleProductSidebar, openAction, openProject, closeProject, gotoSection, expandColumn
 };
