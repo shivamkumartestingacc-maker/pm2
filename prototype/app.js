@@ -1268,23 +1268,41 @@ function renderRail() {
     }));
   });
 
-  /* location: only shown while inside a deep-linked project, so the rail still
-     says where you are and offers the way back. The product sidebar remains the
-     only navigation path. */
-  const ctxBlock = $('#protoContext');
-  const ctxBody = $('#protoContextBody');
-  clear(ctxBody);
-  const inProject = productState.view === 'project' && !!productState.project.id;
-  ctxBlock.hidden = !inProject;
-  if (inProject) {
+  /* flows */
+  const list = $('#flowList');
+  clear(list);
+  const groups = [];
+  FLOWS.forEach(f => {
+    let g = groups.find(x => x.name === f.group);
+    if (!g) { g = { name: f.group, items: [] }; groups.push(g); }
+    g.items.push(f);
+  });
+  groups.forEach((g, gi) => {
+    const groupEl = h('div', { class: 'flow-group' }, h('div', { class: 'flow-group__label', text: g.name }));
+    g.items.forEach((f, i) => {
+      const active = prototypeState.currentFlow === f.id;
+      groupEl.appendChild(h('button', {
+        type: 'button', class: 'flow-item',
+        attrs: { 'aria-current': active ? 'true' : 'false', 'data-flow': f.id },
+        on: { click: () => selectFlow(f.id) }
+      },
+        h('span', { class: 'flow-item__n', text: String(gi * 3 + i + 1).padStart(2, '0') }),
+        h('span', { class: 'flow-item__label', text: f.label })));
+    });
+    list.appendChild(groupEl);
+  });
+
+  /* project context (deep-linked project view) */
+  if (productState.view === 'project' && productState.project.id) {
     const p = getProject(productState.project.id);
     if (p) {
-      ctxBody.appendChild(h('div', { class: 'flow-context' },
+      const ctx = h('div', { class: 'flow-context' },
         h('div', { class: 'flow-context__k', text: 'Inside project' }),
         h('div', { class: 'flow-context__v', text: p.name }),
         h('button', {
           type: 'button', on: { click: () => closeProject() }
-        }, icon('arrowLeft', 12), h('span', { text: productState.project.returnTo === 'records' ? 'Back to Records' : 'Back to Quick Actions' }))));
+        }, icon('arrowLeft', 12), h('span', { text: productState.project.returnTo === 'records' ? 'Back to Records' : 'Back to Quick Actions' })));
+      list.insertBefore(ctx, list.firstChild);
     }
   }
 
