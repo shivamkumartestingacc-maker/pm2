@@ -1229,8 +1229,6 @@ function toast(message, opts = {}) {
 /* =====================================================================
    6. PROTOTYPE CONTROLLER (Layer A)
    ===================================================================== */
-/* The prototype rail is gone, so FLOWS is no longer a visible control list:
-   it is the programmatic navigation vocabulary behind PM.selectFlow(). */
 const FLOWS = [
   { id: 'flow-qa', group: 'Operations', label: 'Quick Actions', apply: () => { productState.view = 'quick-actions'; } },
   { id: 'flow-insights', group: 'Operations', label: 'Insights', apply: () => { productState.view = 'insights'; } },
@@ -1258,57 +1256,58 @@ function syncFlowFromProduct() {
   /* project view: the rail keeps the flow the project was opened from */
 }
 
-/* The prototype chrome is now a top bar (role switch) plus a demo frame
-   around the product viewport. It describes where the product currently is
-   rather than offering a second navigation path: the product sidebar is the
-   only way to move around, exactly as it would be in the real app. */
-function prototypePath() {
-  if (productState.view === 'quick-actions') return '/quick-actions';
-  if (productState.view === 'insights') return '/insights';
-  if (productState.view === 'records') return '/records/' + productState.records.tab;
-  if (productState.view === 'project') {
-    const p = getProject(productState.project.id);
-    const slug = (p ? p.name : 'project').toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-    return '/projects/' + slug + '/' + productState.project.section;
-  }
-  return '/';
-}
-
-function renderPrototypeChrome() {
+function renderRail() {
   /* role switch */
   const switchEl = $('#roleSwitch');
   clear(switchEl);
   Object.keys(ROLES).forEach(roleId => {
-    const role = ROLES[roleId];
     switchEl.appendChild(h('button', {
-      type: 'button',
-      attrs: {
-        'aria-pressed': prototypeState.role === roleId ? 'true' : 'false',
-        'data-role': roleId, title: role.label + ' — ' + role.user.name
-      },
+      type: 'button', text: ROLES[roleId].label,
+      attrs: { 'aria-pressed': prototypeState.role === roleId ? 'true' : 'false', 'data-role': roleId },
       on: { click: () => setRole(roleId) }
-    },
-      h('span', { class: 'role-switch__avatar', text: role.user.initials }),
-      h('span', { text: role.label }),
-      h('span', { class: 'role-switch__who', text: role.user.name })));
+    }));
   });
 
-  /* frame back button mirrors the in-product back affordance */
-  const backEl = $('#protoBack');
-  clear(backEl);
-  const inProject = productState.view === 'project' && !!productState.project.id;
-  backEl.appendChild(icon('arrowLeft', 12));
-  backEl.disabled = !inProject;
-  backEl.title = inProject
-    ? 'Back to ' + (productState.project.returnTo === 'records' ? 'Records' : 'Quick Actions')
-    : 'Nothing to go back to';
+  /* flows */
+  const list = $('#flowList');
+  clear(list);
+  const groups = [];
+  FLOWS.forEach(f => {
+    let g = groups.find(x => x.name === f.group);
+    if (!g) { g = { name: f.group, items: [] }; groups.push(g); }
+    g.items.push(f);
+  });
+  groups.forEach((g, gi) => {
+    const groupEl = h('div', { class: 'flow-group' }, h('div', { class: 'flow-group__label', text: g.name }));
+    g.items.forEach((f, i) => {
+      const active = prototypeState.currentFlow === f.id;
+      groupEl.appendChild(h('button', {
+        type: 'button', class: 'flow-item',
+        attrs: { 'aria-current': active ? 'true' : 'false', 'data-flow': f.id },
+        on: { click: () => selectFlow(f.id) }
+      },
+        h('span', { class: 'flow-item__n', text: String(gi * 3 + i + 1).padStart(2, '0') }),
+        h('span', { class: 'flow-item__label', text: f.label })));
+    });
+    list.appendChild(groupEl);
+  });
 
-  /* frame address bar + status readout */
-  $('#protoPath').textContent = prototypePath();
+  /* project context (deep-linked project view) */
+  if (productState.view === 'project' && productState.project.id) {
+    const p = getProject(productState.project.id);
+    if (p) {
+      const ctx = h('div', { class: 'flow-context' },
+        h('div', { class: 'flow-context__k', text: 'Inside project' }),
+        h('div', { class: 'flow-context__v', text: p.name }),
+        h('button', {
+          type: 'button', on: { click: () => closeProject() }
+        }, icon('arrowLeft', 12), h('span', { text: productState.project.returnTo === 'records' ? 'Back to Records' : 'Back to Quick Actions' })));
+      list.insertBefore(ctx, list.firstChild);
+    }
+  }
+
   const open = visibleActions().length;
-  $('#protoStateReadout').textContent =
-    currentRole().label + ' · ' + open + ' open action' + (open === 1 ? '' : 's');
+  $('#protoStateReadout').textContent = ROLES[prototypeState.role].label + ' · ' + open + ' open action' + (open === 1 ? '' : 's');
 }
 
 function setRole(roleId) {
@@ -1326,7 +1325,7 @@ function setRole(roleId) {
    ===================================================================== */
 function renderAll() {
   syncFlowFromProduct();
-  renderPrototypeChrome();
+  renderRail();
   renderProduct();
 }
 
@@ -3041,7 +3040,6 @@ const openMoneyRecord = (pid, id, kind) => (kind === 'client' ? clientMoneyModal
 function init() {
   initDB();
   renderAll();
-  $('#protoBack').addEventListener('click', () => { if (!productState.project.id) return; closeProject(); });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && activeOverlay) { e.preventDefault(); closeOverlay(); }
   });

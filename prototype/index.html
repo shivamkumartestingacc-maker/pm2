@@ -4,47 +4,52 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PM Dashboard — Interactive Prototype</title>
-<meta name="description" content="Interactive prototype: PM Dashboard product UI shown inside a device-style demo frame, with the prototype role switch in the top bar.">
+<meta name="description" content="Interactive prototype: prototype controller (left) + embedded PM Dashboard product viewport (right).">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div class="proto" id="proto">
 
-  <!-- ===== Layer A · Prototype chrome (top bar + frame) ===== -->
-  <header class="proto-bar">
-    <div class="proto-mark" aria-hidden="true"><span>PM</span></div>
-    <div class="proto-bar__id">
-      <div class="proto-title">Interactive prototype</div>
-      <div class="proto-sub">PM Dashboard · desktop · dummy data</div>
+  <!-- ===== Layer A · Prototype controller ===== -->
+  <aside class="proto-rail" id="protoRail" aria-label="Prototype controller">
+    <div class="proto-rail__head">
+      <div class="proto-mark" aria-hidden="true"><span>PM</span></div>
+      <div>
+        <div class="proto-title">Prototype</div>
+        <div class="proto-sub">PM Dashboard · Desktop</div>
+      </div>
     </div>
 
-    <div class="proto-bar__spacer"></div>
-
-    <div class="proto-bar__role">
-      <span class="proto-label">Role</span>
+    <section class="proto-block">
+      <h2 class="proto-label">Role</h2>
       <div class="role-switch" id="roleSwitch" role="group" aria-label="Prototype role switch"></div>
-    </div>
-  </header>
+      <p class="proto-note">Prototype only. Changes navigation and available controls.</p>
+    </section>
 
-  <!-- ===== Layer B · Product viewport, inside the demo frame ===== -->
+    <section class="proto-block proto-block--grow">
+      <h2 class="proto-label">Flows</h2>
+      <nav class="flow-list" id="flowList" aria-label="Prototype flows"></nav>
+    </section>
+
+    <footer class="proto-rail__foot">
+      <span class="dot"></span>
+      <span id="protoStateReadout">Ready</span>
+    </footer>
+  </aside>
+
+  <!-- ===== Layer B · Product viewport ===== -->
   <main class="proto-stage">
-    <div class="proto-frame">
-      <div class="proto-frame__chrome">
-        <span class="chrome-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <button type="button" class="chrome-btn" id="protoBack" aria-label="Go back"></button>
-        <div class="chrome-url">
-          <span class="chrome-url__host">pm-dashboard.demo</span>
-          <span class="chrome-url__path" id="protoPath">/quick-actions</span>
-        </div>
-        <span class="chrome-status"><span class="dot"></span><span id="protoStateReadout">Ready</span></span>
-      </div>
+    <div class="proto-toolbar">
+      <span class="proto-toolbar__label">Product viewport</span>
+      <span class="proto-toolbar__sep"></span>
+      <span class="proto-toolbar__hint" id="protoHint">Complete product UI renders here</span>
+    </div>
 
-      <div class="product-viewport" id="productViewport">
-        <div class="product" id="product"></div>
-        <div class="overlay-layer" id="overlayLayer" aria-live="polite"></div>
-        <div class="toast-layer" id="toastLayer" aria-live="polite" aria-atomic="true"></div>
-      </div>
+    <div class="product-viewport" id="productViewport">
+      <div class="product" id="product"></div>
+      <div class="overlay-layer" id="overlayLayer" aria-live="polite"></div>
+      <div class="toast-layer" id="toastLayer" aria-live="polite" aria-atomic="true"></div>
     </div>
   </main>
 

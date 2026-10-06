@@ -40,6 +40,7 @@
 
   --font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 
+  --rail-w:264px;
   --pside-w:224px;
 }
 
@@ -84,17 +85,26 @@ table{border-collapse:collapse;width:100%}
    1. PROTOTYPE CONTROLLER (Layer A)
    ===================================================================== */
 .proto{
-  display:flex;flex-direction:column;
-  gap:12px;padding:12px;
-  height:100vh;min-height:560px;
+  display:grid;
+  grid-template-columns:var(--rail-w) minmax(0,1fr);
+  gap:12px;
+  padding:12px;
+  height:100vh;
+  min-height:560px;
 }
 
-/* ---------- Prototype top bar ---------- */
-.proto-bar{
-  display:flex;align-items:center;gap:11px;flex:none;
-  background:var(--white);border:1px solid var(--line);
-  border-radius:var(--r-lg);box-shadow:var(--sh-1);
-  padding:9px 14px;
+.proto-rail{
+  display:flex;flex-direction:column;min-height:0;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--sh-1);
+  overflow:hidden;
+}
+.proto-rail__head{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;
+  border-bottom:1px solid var(--line-soft);
 }
 .proto-mark{
   width:26px;height:26px;flex:none;border-radius:var(--r-sm);
@@ -102,80 +112,86 @@ table{border-collapse:collapse;width:100%}
   display:flex;align-items:center;justify-content:center;
 }
 .proto-mark span{font-size:10px;font-weight:600;letter-spacing:.04em}
-.proto-bar__id{min-width:0}
 .proto-title{font-size:13px;font-weight:600}
 .proto-sub{font-size:11px;color:var(--faint);margin-top:1px}
-.proto-bar__spacer{flex:1;min-width:0}
-.proto-bar__role{display:flex;align-items:center;gap:9px;flex:none}
+
+.proto-block{padding:14px 12px 12px}
+.proto-block--grow{flex:1;min-height:0;display:flex;flex-direction:column;padding-bottom:0}
 .proto-label{
   font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--faint);
+  color:var(--faint);margin:0 0 8px 4px;
 }
+.proto-note{font-size:10.5px;color:var(--faint);line-height:1.4;margin:8px 4px 0}
+
+.proto-rail__foot{
+  display:flex;align-items:center;gap:7px;
+  padding:9px 16px;border-top:1px solid var(--line-soft);
+  font-size:10.5px;color:var(--faint);
+}
+.proto-rail__foot .dot{width:5px;height:5px;border-radius:50%;background:var(--brand);flex:none}
 
 /* Role switch (prototype-only) */
-.role-switch{display:flex;gap:3px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:3px}
+.role-switch{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:3px}
 .role-switch button{
-  display:flex;align-items:center;gap:7px;
-  border:0;background:transparent;border-radius:var(--r-sm);
-  padding:4px 10px 4px 5px;font-size:11.5px;font-weight:500;color:var(--muted);
+  flex:1;border:0;background:transparent;border-radius:var(--r-sm);
+  padding:6px 4px;font-size:11.5px;font-weight:500;color:var(--muted);
   transition:background .14s ease,color .14s ease;
 }
 .role-switch button:hover{color:var(--ink);background:var(--white)}
 .role-switch button[aria-pressed="true"]{background:var(--white);color:var(--ink);font-weight:600;box-shadow:var(--sh-1)}
-.role-switch__avatar{
-  width:20px;height:20px;flex:none;border-radius:50%;
-  background:var(--line-soft);color:var(--muted);
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-weight:600;letter-spacing:.02em;
-}
-.role-switch button[aria-pressed="true"] .role-switch__avatar{background:var(--brand-wash);color:var(--brand-ink)}
-.role-switch__who{color:var(--faint);font-weight:400}
-.role-switch button[aria-pressed="true"] .role-switch__who{color:var(--muted);font-weight:400}
 
-/* ---------- Demo frame ---------- 
-   Window chrome around the product viewport, so the demo reads as a
-   prototype being played rather than a page that happens to be open.
-   Kept strictly neutral: no colour beyond the existing tokens. */
-.proto-stage{display:flex;flex-direction:column;min-width:0;min-height:0;flex:1}
-.proto-frame{
-  display:flex;flex-direction:column;flex:1;min-height:0;
-  width:100%;max-width:1440px;margin:0 auto;
-  background:var(--white);
-  border:1px solid var(--line);border-radius:10px;
-  box-shadow:var(--sh-3);
-  overflow:hidden;
+/* Flow list */
+.flow-list{overflow-y:auto;min-height:0;padding-bottom:8px;margin:0 -4px}
+.flow-group{margin-bottom:10px}
+.flow-group__label{
+  font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);padding:6px 8px 4px;
 }
-.proto-frame__chrome{
-  height:34px;flex:none;display:flex;align-items:center;gap:10px;
-  padding:0 12px;background:var(--surface);border-bottom:1px solid var(--line);
-}
-.chrome-dots{display:flex;gap:5px;flex:none}
-.chrome-dots i{width:9px;height:9px;border-radius:50%;background:#DEDEDE;border:1px solid #D2D2D2}
-.chrome-btn{
-  width:22px;height:22px;flex:none;
-  display:flex;align-items:center;justify-content:center;
-  border:0;background:transparent;border-radius:var(--r-sm);color:var(--muted);
+.flow-item{
+  display:flex;align-items:center;gap:9px;width:100%;
+  border:0;background:transparent;text-align:left;
+  padding:7px 9px;border-radius:var(--r-md);
+  color:var(--muted);font-size:12.5px;
+  border-left:2px solid transparent;
   transition:background .14s ease,color .14s ease;
 }
-.chrome-btn:hover:not(:disabled){background:var(--white);color:var(--ink)}
-.chrome-btn:disabled{opacity:.35;cursor:default}
-.chrome-url{
-  flex:1;min-width:0;display:flex;align-items:center;
-  height:22px;padding:0 10px;background:var(--white);
-  border:1px solid var(--line);border-radius:var(--r-sm);
-  font-size:11px;color:var(--muted);
+.flow-item:hover{background:var(--surface);color:var(--ink)}
+.flow-item[aria-current="true"]{
+  background:var(--brand-wash);color:var(--ink);font-weight:600;
+  border-left-color:var(--brand);
 }
-.chrome-url__host{color:var(--faint);flex:none}
-.chrome-url__path{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chrome-status{
-  display:flex;align-items:center;gap:6px;flex:none;
-  font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums;
+.flow-item__n{font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums;width:16px;flex:none}
+.flow-item[aria-current="true"] .flow-item__n{color:var(--brand)}
+.flow-item__label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.flow-context{
+  margin:2px 4px 8px;padding:8px 9px;
+  background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r-md);
 }
-.chrome-status .dot{width:5px;height:5px;border-radius:50%;background:var(--brand);flex:none}
+.flow-context__k{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.flow-context__v{font-size:12px;font-weight:600;margin-top:2px}
+.flow-context button{
+  margin-top:7px;width:100%;border:1px solid var(--line);background:var(--white);
+  border-radius:var(--r-sm);padding:5px;font-size:11.5px;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.flow-context button:hover{color:var(--ink);border-color:#D5D5D5}
+
+/* =====================================================================
+   2. PRODUCT VIEWPORT FRAME
+   ===================================================================== */
+.proto-stage{display:flex;flex-direction:column;min-width:0;min-height:0;gap:8px}
+.proto-toolbar{display:flex;align-items:center;gap:8px;padding:0 4px;font-size:10.5px;color:var(--faint)}
+.proto-toolbar__label{font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+.proto-toolbar__sep{width:1px;height:10px;background:var(--line)}
+.proto-toolbar__hint{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .product-viewport{
   position:relative;flex:1;min-height:0;
   background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--sh-2);
   overflow:hidden;
 }
 .product{display:grid;grid-template-columns:var(--pside-w) minmax(0,1fr);height:100%;min-height:0}
@@ -745,16 +761,12 @@ textarea.input{height:auto;padding:8px 9px;resize:vertical;min-height:64px;line-
    10. RESPONSIVE — 1440 primary, 1280 / 1024 supported
    ===================================================================== */
 @media (max-width:1360px){
-  :root{--pside-w:208px}
+  :root{--rail-w:240px;--pside-w:208px}
   .qcol{flex-basis:278px;width:278px}
   .search .input{width:190px}
 }
 @media (max-width:1180px){
-  :root{--pside-w:196px}
-  .proto-bar{padding:8px 12px;gap:9px}
-  .role-switch button{padding:4px 8px 4px 4px}
-  .role-switch__who{display:none}
-  .chrome-status{display:none}
+  :root{--rail-w:222px;--pside-w:196px}
   .pside__brand{padding:14px 13px}
   .nav-item{padding:8px 11px 8px 10px;gap:7px;font-size:12px}
   .nav-group__label{padding-left:12px}
