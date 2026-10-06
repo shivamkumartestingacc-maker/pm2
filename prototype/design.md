@@ -107,6 +107,8 @@ Dates, amounts and counts always use `font-variant-numeric: tabular-nums` (`.tnu
 | Drawer | `.overlay--drawer` | Right-anchored, 600 px |
 | Empty state | `.empty` | Icon + one line of title + one line of explanation |
 | Toast | `.toast` | Dark pill, bottom-centre of the viewport, 4.2 s |
+| Demo frame | `.proto-frame` | Window chrome (dots, back, address bar, status) around the product viewport. Neutral only — browser chrome must never compete with the product. |
+| Prototype bar | `.proto-bar`, `.role-switch` | Role switch (PM Admin / PM). The only prototype-level control outside the frame. |
 
 ---
 
@@ -145,11 +147,14 @@ actionable items and always deep-links to the exact project section.
 
 Primary: **1440 px**. Supported: **1280 px** and **1024 px**.
 
-| Breakpoint | Prototype rail | Product sidebar | Board column |
+| Breakpoint | Demo frame | Product sidebar | Board column |
 | --- | --- | --- | --- |
-| ≥ 1360 px | 264 px | 224 px | 296 px |
-| ≤ 1360 px | 240 px | 208 px | 278 px |
-| ≤ 1180 px | 222 px | 196 px | 262 px (expanded min 360 px) |
+| ≥ 1360 px | full width, max 1440 px | 224 px | 296 px |
+| ≤ 1360 px | full width | 208 px | 278 px |
+| ≤ 1180 px | full width | 196 px | 262 px (expanded min 360 px) |
+
+The **prototype bar** (role switch) sits above the frame at every breakpoint; the product sidebar
+tightens under 1180 px and the frame's status readout hides there.
 
 This is a desktop prototype. Below 1024 px nothing is redesigned; the board simply scrolls
 horizontally.
