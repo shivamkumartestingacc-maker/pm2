@@ -718,7 +718,10 @@ const getHandoverDoc = (pid, id) => {
    ===================================================================== */
 const prototypeState = {
   currentFlow: 'flow-qa',
-  role: 'pm-admin'
+  role: 'pm-admin',
+  /* the prototype rail can be collapsed to a slim strip so the product
+     viewport gets the full width; the role switch stays reachable */
+  railCollapsed: false
 };
 
 const productState = {
@@ -1261,12 +1264,22 @@ function renderRail() {
   const switchEl = $('#roleSwitch');
   clear(switchEl);
   Object.keys(ROLES).forEach(roleId => {
+    const role = ROLES[roleId];
     switchEl.appendChild(h('button', {
-      type: 'button', text: ROLES[roleId].label,
-      attrs: { 'aria-pressed': prototypeState.role === roleId ? 'true' : 'false', 'data-role': roleId },
+      type: 'button',
+      attrs: {
+        'aria-pressed': prototypeState.role === roleId ? 'true' : 'false',
+        'data-role': roleId,
+        title: role.label + ' — ' + role.user.name
+      },
       on: { click: () => setRole(roleId) }
-    }));
+    },
+      h('span', { class: 'role-btn__ini', text: role.user.initials }),
+      h('span', { class: 'role-btn__label', text: role.label })));
   });
+
+  /* collapsed/expanded state of the rail itself */
+  applyRailState();
 
   /* flows */
   const list = $('#flowList');
@@ -1308,6 +1321,26 @@ function renderRail() {
 
   const open = visibleActions().length;
   $('#protoStateReadout').textContent = ROLES[prototypeState.role].label + ' · ' + open + ' open action' + (open === 1 ? '' : 's');
+}
+
+/* Collapsing only changes the prototype rail's own footprint — it never
+   touches what the product viewport renders. */
+function applyRailState() {
+  const collapsed = !!prototypeState.railCollapsed;
+  const shell = $('#proto');
+  if (shell) shell.classList.toggle('is-collapsed', collapsed);
+
+  const btn = $('#railToggle');
+  if (btn) {
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    btn.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+    btn.title = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+    if (!btn.firstChild) btn.appendChild(icon('chevron', 12));
+  }
+}
+function toggleRail() {
+  prototypeState.railCollapsed = !prototypeState.railCollapsed;
+  applyRailState();
 }
 
 function setRole(roleId) {
@@ -3040,6 +3073,7 @@ const openMoneyRecord = (pid, id, kind) => (kind === 'client' ? clientMoneyModal
 function init() {
   initDB();
   renderAll();
+  $('#railToggle').addEventListener('click', toggleRail);
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && activeOverlay) { e.preventDefault(); closeOverlay(); }
   });
@@ -3051,5 +3085,5 @@ else init();
 window.PM = {
   prototypeState, productState, DB, ROLES, CATEGORIES,
   buildActions, visibleActions, actionsByCategory, buildInsights,
-  selectFlow, setRole, openAction, openProject, closeProject, gotoSection, expandColumn
+  selectFlow, setRole, toggleRail, openAction, openProject, closeProject, gotoSection, expandColumn
 };

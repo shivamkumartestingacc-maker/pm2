@@ -9,7 +9,9 @@
 - `prototype/app.js` — prototype controller, product UI, dummy data and interactions
 - `prototype/design.md` — visual/design-system reference
 
-Layout: the left rail is the **prototype controller** (role switch + flow selector); the right
+Layout: the left rail is the **prototype controller** (role switch + flow selector) and can be
+collapsed to a slim strip with the chevron in its header — the role switch stays reachable as
+initials. The right
 panel is the **embedded product viewport** containing the complete PM Dashboard UI.
 Flow switching re-renders the viewport in place — there are no separate pages and no
 `window.location` navigation. Vanilla HTML/CSS/JS, no build step.
