@@ -86,6 +86,9 @@ const ICONS = {
 };
 function icon(name, size = 14, cls = '') {
   const span = h('span', { class: 'ico ico--' + size + (cls ? ' ' + cls : ''), attrs: { 'aria-hidden': 'true' } });
+  /* explicit box so a size with no matching CSS class still renders correctly */
+  span.style.width = size + 'px';
+  span.style.height = size + 'px';
   span.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
     (ICONS[name] || '') + '</svg>';
   return span;
@@ -1345,7 +1348,7 @@ function buildProductSidebar() {
     return h('button', {
       type: 'button', class: 'nav-item', attrs: { 'aria-current': active ? 'page' : null, 'data-nav': opts.id },
       on: { click: opts.onClick }
-    }, icon(opts.icon, 15), h('span', { class: 'nav-item__label', text: opts.label }),
+    }, icon(opts.icon, 13), h('span', { class: 'nav-item__label', text: opts.label }),
       opts.count != null ? h('span', { class: 'nav-count', text: String(opts.count) }) : null);
   };
 

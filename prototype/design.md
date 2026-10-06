@@ -68,6 +68,8 @@ Dates, amounts and counts always use `font-variant-numeric: tabular-nums` (`.tnu
 
 ## 3. Spacing, radius, elevation
 
+- Icons are 12–16 px, boxed explicitly by the `icon()` helper so an unlisted size can never render
+  at the SVG default size.
 - Base rhythm: 4 / 7 / 9 / 12 / 14 / 16 / 20 px. Panel bodies pad 14–16 px; page areas pad 16–20 px.
 - Radii: `--r-sm` 4 px (inputs, chips, small buttons), `--r-md` 6 px (buttons, cards, menus),
   `--r-lg` 8 px (panels, viewport, modals). Nothing is pill-shaped except count chips.
@@ -87,6 +89,7 @@ Dates, amounts and counts always use `font-variant-numeric: tabular-nums` (`.tnu
 | Panels | `.panel`, `.panel__head`, `.panel__body` | The standard content container |
 | Tables | `.table` inside `.table-wrap` | Sticky uppercase header, 12 px cells, hover row, `.is-focus` for deep-linked rows |
 | Tabs | `.tabs` / `.tab` | Underline tabs, brand underline when selected |
+| Sidebar nav | `.pside`, `.nav-item` | Vertical tab list: flush full-width rows, no card/box treatment. Selected tab = 2 px brand rail on the left + `--brand-wash` background + brand icon + bold label. Hover tints the row to `rgba(23,23,23,.035)`. |
 | Key-value grid | `.kv-grid` / `.kv` | Hairline-separated fact grid |
 | Stat strip | `.stat-strip` | 3–4 headline figures at the top of a modal |
 | Progress meter | `.meter` / `.meter-row` | 4 px bar; never a chart |
