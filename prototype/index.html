@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PM Dashboard — Interactive Prototype</title>
+<meta name="description" content="Interactive prototype: prototype controller (left) + embedded PM Dashboard product viewport (right).">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="proto" id="proto">
+
+  <!-- ===== Layer A · Prototype controller ===== -->
+  <aside class="proto-rail" id="protoRail" aria-label="Prototype controller">
+    <div class="proto-rail__head">
+      <div class="proto-mark" aria-hidden="true"><span>PM</span></div>
+      <div>
+        <div class="proto-title">Prototype</div>
+        <div class="proto-sub">PM Dashboard · Desktop</div>
+      </div>
+    </div>
+
+    <section class="proto-block">
+      <h2 class="proto-label">Role</h2>
+      <div class="role-switch" id="roleSwitch" role="group" aria-label="Prototype role switch"></div>
+      <p class="proto-note">Prototype only. Changes navigation and available controls.</p>
+    </section>
+
+    <section class="proto-block proto-block--grow">
+      <h2 class="proto-label">Flows</h2>
+      <nav class="flow-list" id="flowList" aria-label="Prototype flows"></nav>
+    </section>
+
+    <footer class="proto-rail__foot">
+      <span class="dot"></span>
+      <span id="protoStateReadout">Ready</span>
+    </footer>
+  </aside>
+
+  <!-- ===== Layer B · Product viewport ===== -->
+  <main class="proto-stage">
+    <div class="proto-toolbar">
+      <span class="proto-toolbar__label">Product viewport</span>
+      <span class="proto-toolbar__sep"></span>
+      <span class="proto-toolbar__hint" id="protoHint">Complete product UI renders here</span>
+    </div>
+
+    <div class="product-viewport" id="productViewport">
+      <div class="product" id="product"></div>
+      <div class="overlay-layer" id="overlayLayer" aria-live="polite"></div>
+      <div class="toast-layer" id="toastLayer" aria-live="polite" aria-atomic="true"></div>
+    </div>
+  </main>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
